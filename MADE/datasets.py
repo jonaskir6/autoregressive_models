@@ -12,7 +12,8 @@ class Dataset(object):
         self.data_dir = data_dir
         # Binirize MNIST
         self.transform = transforms.Compose([transforms.ToTensor(),
-                                              Binarize()])
+                              Binarize(),
+                              transforms.Flatten()])
         # Train and test data
         self.train_data = datasets.MNIST(self.data_dir, train=True, download=True, transform=self.transform)
         self.test_data = datasets.MNIST(self.data_dir, train=False, transform=self.transform)
