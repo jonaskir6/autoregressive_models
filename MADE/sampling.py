@@ -17,12 +17,21 @@ def sample(model, num_samples=100, device='cuda'):
     return samples.cpu().numpy().reshape(-1, 28, 28) # Reshape to (num_samples, 28, 28)
 
 def save_samples(samples, filename='samples.png'):
-    fig, axs = plt.subplots(10, 10, figsize=(28, 28))
+    # Get the number of samples
+    num_samples = samples.shape[0]
+    # We use the ceiling of the square root of the number of samples to ensure all samples fit
+    grid_size = int(np.ceil(np.sqrt(num_samples)))
+
+    fig, axs = plt.subplots(grid_size, grid_size, figsize=(grid_size * 2.8, grid_size * 2.8))
     axs = axs.flatten()
 
     for img, ax in zip(samples, axs):
         ax.imshow(img, cmap='gray', interpolation='none')
         ax.axis('off')
+
+    # Turn off remaining empty subplots
+    for i in range(num_samples, len(axs)):
+        axs[i].axis('off')
 
     plt.tight_layout()
     plt.savefig(filename)
