@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def sample(model, num_samples=100, device='cuda'):
+    model.to(device)
     model.eval()  # Set the model to evaluation mode
     image_size = 28*28 # MNIST dataset image size
     
