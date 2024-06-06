@@ -26,16 +26,17 @@ class MADE(nn.Module):
         layers.append(MaskedLayer(num_units,input_feat,ordering,self.m_k[num_layer-1],"output"))
 
 
-        self.layer=nn.Sequential(*layers)
+        self.layer=nn.ModuleList(layers)
 
     def forward(self,input):
-        return self.layer(input)
+        x = input
+        for layer in self.layer:
+            x = layer(x)
+        return x
     
         
 
-
 class MaskedLayer(nn.Linear):
-
     def __init__(self, in_feat, out_feat, m_k, m_k_prev, layer_type):
         super().__init__(in_features=in_feat, out_features=out_feat)
         self.mask= torch.zeros(out_feat, in_feat)
@@ -50,5 +51,6 @@ class MaskedLayer(nn.Linear):
                         self.mask[i,j]=1
             
 
+# TODO : fix mask device
     def forward(self, x):
-        return nn.functional.linear(x, self.weight * self.mask, self.bias)
+        return nn.functional.linear(x, self.weight * self.mask.cuda(), self.bias)
