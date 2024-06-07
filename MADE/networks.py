@@ -24,6 +24,7 @@ class MADE(nn.Module):
 
 
         layers.append(MaskedLayer(num_units,input_feat,ordering,self.m_k[num_layer-1],"output"))
+        layers.append(nn.Sigmoid())
 
 
         self.layer=nn.ModuleList(layers)
