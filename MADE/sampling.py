@@ -11,7 +11,7 @@ def sample(model, num_samples=100, device='cuda'):
         samples = torch.zeros((num_samples, image_size), device=device)
         for i in range(image_size):
             logits = model(samples)  # Get the logits for the current samples
-            probs = torch.sigmoid(logits[:, i])  # Convert logits to probabilities
+            probs = logits[:, i]  # Convert logits to probabilities
             samples[:, i] = torch.bernoulli(probs)  # Sample from the Bernoulli distribution
 
     return samples.cpu().numpy().reshape(-1, 28, 28) # Reshape to (num_samples, 28, 28)
