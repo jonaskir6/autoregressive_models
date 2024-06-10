@@ -27,9 +27,6 @@ class MADE(nn.Module):
 
         self.layer=nn.ModuleList(layers)
 
-    def shuffle_ordering(self, ordering):
-        self.layer[0].update_mask(self, m_k = self.m_k[1], m_k_prev = ordering)
-
     def forward(self,input):
         x = input
         for layer in self.layer:
@@ -50,14 +47,6 @@ class MaskedLayer(nn.Linear):
                 else:
                     if m_k[i]>=m_k_prev[j]:
                         self.mask[i,j]=1
-    
-    def update_mask(self, m_k, m_k_prev):
-        self.mask.fill_(0)
-        for j in range(self.in_features):
-            for i in range(self.out_features):
-                if m_k[i]>=m_k_prev[j]:
-                    self.mask[i,j]=1
          
-
     def forward(self, x):
         return nn.functional.linear(x, self.weight * self.mask, self.bias)
