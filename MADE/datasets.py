@@ -10,7 +10,7 @@ class Dataset():
 
     def __init__(self, dataset, batch_size=64, data_dir='data'):
         self.data_dir = data_dir
-        # Binirize MNIST
+        # Binarize MNIST
         self.transform = transforms.Compose([transforms.ToTensor(),
                               Binarize(),
                               torch.nn.Flatten(0)])

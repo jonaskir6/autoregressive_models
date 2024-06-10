@@ -15,12 +15,10 @@ class MADE(nn.Module):
 
         layers=[]
         layers.append(MaskedLayer(in_feat=input_feat,out_feat=num_units,m_k=self.m_k[1],m_k_prev=self.m_k[0],layer_type="hidden"))
-        #layers.append(nn.BatchNorm1d(num_units))
-        layers.append(nn.ReLU())
+        layers.append(nn.LeakyReLU())
         for i in range(2,num_layer):
             layers.append(MaskedLayer(num_units,num_units,m_k=self.m_k[i],m_k_prev=self.m_k[i-1],layer_type="hidden"))
-            #layers.append(nn.BatchNorm1d(num_units))
-            layers.append(nn.ReLU())
+            layers.append(nn.LeakyReLU())
 
 
         layers.append(MaskedLayer(num_units,input_feat,m_k=ordering,m_k_prev=self.m_k[num_layer-1],layer_type="output"))
@@ -35,7 +33,6 @@ class MADE(nn.Module):
             x = layer(x)
         return x
     
-        
 
 class MaskedLayer(nn.Linear):
     def __init__(self, in_feat, out_feat, m_k, m_k_prev, layer_type):
