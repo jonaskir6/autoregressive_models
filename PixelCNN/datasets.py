@@ -1,0 +1,62 @@
+import torch
+from torchvision import datasets, transforms    
+import ssl
+
+
+ssl._create_default_https_context = ssl._create_unverified_context
+
+class Dataset():
+
+    def __init__(self, dataset, batch_size=64, data_dir='data'):
+        self.data_dir = data_dir
+        # Binarize MNIST
+        self.transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        ])
+        # Train and test data
+        if dataset == 'mnist':
+            self.train_data = datasets.MNIST(self.data_dir, train=True, download=True, transform=self.transform)
+            self.test_data = datasets.MNIST(self.data_dir, train=False, transform=self.transform)
+        elif dataset == 'cifar10':
+            self.train_data = datasets.CIFAR10(self.data_dir, train=True, download=True, transform=self.transform)
+            self.test_data = datasets.CIFAR10(self.data_dir, train=False, transform=self.transform)
+        else:
+            raise ValueError('Dataset not implemented')
+        # Data loaders
+        self.train_data_loader = torch.utils.data.DataLoader(self.train_data, batch_size, shuffle=True)
+        self.test_data_loader = torch.utils.data.DataLoader(self.test_data, batch_size, shuffle=False)
+    
+    def get_train_data_loader(self):
+        return self.train_data_loader
+
+    def get_test_data_loader(self):
+        return self.test_data_loader
+    
+    def visualize_dataset(self, data_loader):
+        """
+        Visualize the dataset
+        Args:
+            data_loader: train_data_loader or test_data_loader (train or test dataset)
+        """
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        # Define the CIFAR-10 class names
+        class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+
+        # Iterator and first batch of data/labels
+        data_iter = iter(data_loader)
+        images, labels = next(data_iter)
+
+        fig = plt.figure(figsize=(25, 8))
+        for idx in np.arange(40): 
+            ax = fig.add_subplot(4, 10, idx+1, xticks=[], yticks=[]) 
+            if images.shape[1] == 1:
+                ax.imshow(np.squeeze(images[idx]), cmap='gray')
+            else:
+                ax.imshow(np.transpose(images[idx], (1, 2, 0)))
+            ax.set_title(class_names[labels[idx].item()], fontsize=12)
+
+            plt.subplots_adjust(hspace=0.5)  
+        plt.show()
