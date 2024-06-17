@@ -7,3 +7,5 @@ MADE:
 10.06: tested various parameter settings (together)
 
 PixelCNN:
+13.06: Jonas Kirch implemented initial form of datasets.py & networks.py (classes PixelCNN, MaskedConv2d & ResidualBlock without Color Channel dependencies)
+17.06: Group Session: started completion.py, train loop and added color channel dependencies to networks.py
