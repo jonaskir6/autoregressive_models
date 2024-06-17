@@ -8,19 +8,21 @@ ssl._create_default_https_context = ssl._create_unverified_context
 class Dataset():
 
     def __init__(self, dataset, batch_size=64, data_dir='data'):
-        self.data_dir = data_dir
-        # Binarize MNIST
-        self.transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-        ])
+        self.dataset = dataset
+        if dataset=='cifar10':
+            self.transform = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+            ])
+        elif dataset=='mnist':
+            self.transform = transforms.ToTensor()
         # Train and test data
         if dataset == 'mnist':
-            self.train_data = datasets.MNIST(self.data_dir, train=True, download=True, transform=self.transform)
-            self.test_data = datasets.MNIST(self.data_dir, train=False, transform=self.transform)
+            self.train_data = datasets.MNIST(data_dir, train=True, download=True, transform=self.transform)
+            self.test_data = datasets.MNIST(data_dir, train=False, transform=self.transform)
         elif dataset == 'cifar10':
-            self.train_data = datasets.CIFAR10(self.data_dir, train=True, download=True, transform=self.transform)
-            self.test_data = datasets.CIFAR10(self.data_dir, train=False, transform=self.transform)
+            self.train_data = datasets.CIFAR10(data_dir, train=True, download=True, transform=self.transform)
+            self.test_data = datasets.CIFAR10(data_dir, train=False, transform=self.transform)
         else:
             raise ValueError('Dataset not implemented')
         # Data loaders
@@ -49,14 +51,26 @@ class Dataset():
         data_iter = iter(data_loader)
         images, labels = next(data_iter)
 
-        fig = plt.figure(figsize=(25, 8))
-        for idx in np.arange(40): 
-            ax = fig.add_subplot(4, 10, idx+1, xticks=[], yticks=[]) 
-            if images.shape[1] == 1:
-                ax.imshow(np.squeeze(images[idx]), cmap='gray')
-            else:
-                ax.imshow(np.transpose(images[idx], (1, 2, 0)))
-            ax.set_title(class_names[labels[idx].item()], fontsize=12)
 
-            plt.subplots_adjust(hspace=0.5)  
+        if self.dataset=='cifar10':
+            fig = plt.figure(figsize=(25, 8))
+            for idx in np.arange(40): 
+                ax = fig.add_subplot(4, 10, idx+1, xticks=[], yticks=[]) 
+                if images.shape[1] == 1:
+                    ax.imshow(np.squeeze(images[idx]))
+                else:
+                    ax.imshow(np.transpose(images[idx], (1, 2, 0)))
+                ax.set_title(class_names[labels[idx].item()], fontsize=12)
+
+                plt.subplots_adjust(hspace=0.5)  
+            
+        elif self.dataset=='mnist':
+            fig = plt.figure(figsize=(25, 4))
+            for idx in np.arange(20):
+                # subplot 2 rows and 10 columns, no grid, index starting from 1
+                ax = fig.add_subplot(2, 10, idx+1, xticks=[], yticks=[])
+                # Reshape the image (2D) & make it grayscale
+                ax.imshow(np.squeeze(images[idx]).view(28, 28), cmap='gray')
+                # Print the label as title
+                ax.set_title(str(labels[idx].item()))
         plt.show()
