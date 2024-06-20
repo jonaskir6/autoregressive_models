@@ -18,7 +18,8 @@ class PixelCNN(nn.Module):
             *[ResidualBlock(2*num_kernels) for _ in range(num_residual)],
             MaskedConv2d(in_channels=2*num_kernels, out_channels=num_kernels, mask_type='B', kernel_size=1, padding=0),
             MaskedConv2d(in_channels=num_kernels, out_channels=3, mask_type='B', kernel_size=1, padding=0),
-            nn.ReLU()
+            nn.ReLU(),
+            # nn.Sigmoid()
         )
 
     def forward(self, x):
