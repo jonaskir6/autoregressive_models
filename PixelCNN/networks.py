@@ -16,8 +16,8 @@ class PixelCNN(nn.Module):
         self.net = nn.Sequential(
             MaskedConv2d(mask_type='A', kernel_size=7, in_channels=3 ,out_channels=2*num_kernels, padding=3),
             *[ResidualBlock(2*num_kernels) for _ in range(num_residual)],
-            MaskedConv2d(in_channels=2*num_kernels, out_channels=num_kernels, mask_type='B', kernel_size=1, padding=1),
-            MaskedConv2d(in_channels=num_kernels, out_channels=3, mask_type='B', kernel_size=1, padding=1),
+            MaskedConv2d(in_channels=2*num_kernels, out_channels=num_kernels, mask_type='B', kernel_size=1, padding=0),
+            MaskedConv2d(in_channels=num_kernels, out_channels=3, mask_type='B', kernel_size=1, padding=0),
             nn.ReLU()
         )
 
