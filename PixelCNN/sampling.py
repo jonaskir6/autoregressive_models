@@ -13,19 +13,17 @@ def sample(model, num_samples=100, device='cuda'):
         samples = torch.zeros((num_samples, 3, 32, 32), device=device)
         for i in range(32):
             for j in range(32):
-                # Get the logits for the current samples
-                out = model(samples)
-                # Convert logits to probabilities (already done in networks.py as a Softmax layer)
-                out = F.softmax(out, dim=1)
-                print(out)
-                # print(probs[1][:])
-                # Sample from the distribution
-                probs = out[:, :, i, j]
-
-                for k in range(3): 
-                    pixel = torch.multinomial(probs[:, k], 1)
+                # Iterate over each channel
+                for k in range(3):  
+                    # Get the logits for the current samples
+                    out = model(samples)
+                    # Convert logits to probabilities (already done in networks.py as a Softmax layer)
+                    probs = F.softmax(out[:, k*256:(k+1)*256, i, j], dim=1)
+                    # print(probs[1][:])
+                    # Sample from the distribution
+                    pixel = torch.multinomial(probs, 1).squeeze(1)
                     # print(pixel)
-                    samples[:, k, i, j] = pixel[:, 0]
+                    samples[:, k, i, j] = pixel / 255
 
     return samples.permute(0,2,3,1).cpu().detach().numpy() 
 
