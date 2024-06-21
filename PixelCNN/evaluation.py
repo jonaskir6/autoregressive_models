@@ -3,7 +3,7 @@ from torch import nn
 
 
 
-def evaluate(test_data_loader, model, device):
+def evaluate(test_data_loader, model, device, batch_size):
     num_correct = 0
     num_total = 0
 
@@ -18,7 +18,8 @@ def evaluate(test_data_loader, model, device):
             images = images.to(device)
             output = model(images)
             images = images.view(-1)
-            output = output.permute(0, 2, 3, 1).contiguous().view(-1, 256)
+            output = torch.reshape(output, (batch_size, 256, 3, 32, 32))
+            output = output.permute(0,2,3,4,1).contiguous().view(-1, 256)
             # loss_func = nn.functional.cross_entropy(output,images)
             loss.append(nn.functional.cross_entropy(output, (images*255).long()))
 
