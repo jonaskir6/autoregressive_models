@@ -17,7 +17,10 @@ def evaluate(test_data_loader, model, device):
        
             images = images.to(device)
             output = model(images)
-            loss.append(nn.functional.cross_entropy(output,images))
+            images = images.view(-1)
+            output = output.permute(0, 2, 3, 1).contiguous().view(-1, 256)
+            # loss_func = nn.functional.cross_entropy(output,images)
+            loss.append(nn.functional.cross_entropy(output, (images*255).long()))
 
     loss=torch.Tensor(loss)   
     return torch.mean(loss)

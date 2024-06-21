@@ -12,7 +12,6 @@ class Dataset():
         if dataset=='cifar10':
             self.transform = transforms.Compose([
                 transforms.ToTensor(),
-                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
             ])
         elif dataset=='mnist':
             self.transform = transforms.ToTensor()
