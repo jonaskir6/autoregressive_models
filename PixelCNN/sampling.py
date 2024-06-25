@@ -2,6 +2,7 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
+import torchvision
 
 def sample(model, num_samples=100, device='cuda'):
     model.to(device)
@@ -27,29 +28,50 @@ def sample(model, num_samples=100, device='cuda'):
 
     return samples.permute(0,2,3,1).cpu().detach().numpy() 
 
-def save_samples(samples, filename='samples.png'):
-    # Get the number of samples
-    num_samples = samples.shape[0]
-
-    if(num_samples<=5):
-        grid_size_1 = 1
-        grid_size_2 = num_samples
-    else:
-        # We use the ceiling of the square root of the number of samples to ensure all samples fit
-        grid_size_1 = int(np.ceil(np.sqrt(num_samples)))
-        grid_size_2 = grid_size_1
+def samplemnist(model, num_samples=100, device='cuda'):
+    model.to(device)
+    # Set the model to evaluation mode
+    model.eval()
     
-    fig, axs = plt.subplots(grid_size_1, grid_size_2, figsize=(32, 32))
-    axs = axs.flatten()
+    # Disable gradient computation
+    with torch.no_grad():  
+        samples = torch.zeros((num_samples, 1, 28, 28), device=device)
+        for i in range(28):
+            for j in range(28):
+                # Get the logits for the current samples
+                out = model(samples)
+                # Convert logits to probabilities (already done in networks.py as a Softmax layer)
+                probs = F.softmax(out[:, :, i, j], dim=-1).data
+                # print(probs[1][:])
+                # Sample from the distribution
+                samples[:, :, i, j] = torch.multinomial(probs, 1).float() / 255.0
+                # print(pixel)
+    return torchvision.utils.save_image(samples, 'sample.png', nrow=10, padding=0)
+    
 
-    for img, ax in zip(samples, axs):
-        ax.imshow((img / 3 * 255).astype(int))
-        ax.axis('off')
+# def save_samples(samples, filename='samples.png'):
+#     # Get the number of samples
+#     num_samples = samples.shape[0]
 
-    # Turn off remaining empty subplots
-    for i in range(num_samples, len(axs)):
-        axs[i].axis('off')
+#     if(num_samples<=5):
+#         grid_size_1 = 1
+#         grid_size_2 = num_samples
+#     else:
+#         # We use the ceiling of the square root of the number of samples to ensure all samples fit
+#         grid_size_1 = int(np.ceil(np.sqrt(num_samples)))
+#         grid_size_2 = grid_size_1
+    
+#     fig, axs = plt.subplots(grid_size_1, grid_size_2, figsize=(32, 32))
+#     axs = axs.flatten()
 
-    plt.tight_layout()
-    plt.savefig(filename)
-    plt.show()
+#     for img, ax in zip(samples, axs):
+#         ax.imshow((img / 3 * 255).astype(int))
+#         ax.axis('off')
+
+#     # Turn off remaining empty subplots
+#     for i in range(num_samples, len(axs)):
+#         axs[i].axis('off')
+
+#     plt.tight_layout()
+#     plt.savefig(filename)
+#     plt.show()
