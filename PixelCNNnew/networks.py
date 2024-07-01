@@ -76,7 +76,6 @@ class PixelCNN(nn.Module):
 class PixelCNNv2(nn.Module):
     def __init__(self, num_kernels=64, num_residual=10):
         super(PixelCNNv2, self).__init__()
-        self.layers = nn.ModuleList()
 
         self.num_residual = num_residual
         self.conv_layers = nn.ModuleList()
@@ -147,5 +146,5 @@ class ResidualBlock(nn.Module):
         out = F.relu(self.conv1x1_1(out))
         out = F.relu(self.conv3x3(out))
         out = self.conv1x1_2(out)
-        return out + x
+        return out
     

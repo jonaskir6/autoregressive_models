@@ -18,7 +18,7 @@ def sample(model, num_samples=100, device='cuda'):
                     # Get the logits for the current samples
                     out = model(samples)
                     # Convert logits to probabilities (already done in networks.py as a Softmax layer)
-                    probs = F.softmax(out[:, k*256:(k+1)*256, i, j], dim=1)
+                    probs = F.softmax(torch.reshape(out, (num_samples, 256, 3, 32, 32))[:, :, k, i, j], dim=1)
                     # print(probs[1][:])
                     # Sample from the distribution
                     pixel = torch.multinomial(probs, 1).squeeze(1)
