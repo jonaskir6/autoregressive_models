@@ -1,5 +1,6 @@
 import torch
 import torchvision
+import torch.nn.functional as F
 import numpy as np
 import matplotlib.pyplot as plt
 import datasets, networks, sampling, evaluation
@@ -25,7 +26,7 @@ def get_random_cifar10_image(dataset_instance):
     image = images[random_image_index]
     label = labels[random_image_index]
     
-    return image, label
+    return image
 
 def mask_image(image, mask_fraction=0.5):
     C, H, W = image.shape
@@ -51,23 +52,26 @@ def complete(model, masked_image, mask, num_completions=5, device='cuda'):
     completed_images = []
     with torch.no_grad():
         for _ in range(num_completions):
-            completed_image = masked_image.clone()
+            completed_image = masked_image.clone().unsqueeze(0)
             C, H, W = masked_image.shape
 
             for i in range(H):
                 for j in range(W):
                     for c in range(C):
                         if mask[c, i, j] == 0:
-                            logits = model(completed_image)
-                            probs = logits[0, c, i, j]
-                            pixel = torch.multinomial(probs, 1)
-                            completed_image[c, i, j] = pixel.item()
-            completed_images.append(completed_image.cpu().numpy())
+                            out = model(completed_image)
+                            # Convert logits to probabilities (already done in networks.py as a Softmax layer)
+                            probs = F.softmax(torch.reshape(out, (1, 256, 3, 32, 32))[:, :, c, i, j], dim=1)
+                         # Sample from the distribution
+                            pixel = torch.multinomial(probs, 1).squeeze(1)
+                            completed_image[:, c, i, j] = pixel / 255
+            completed_images.append(completed_image.squeeze(0).cpu().numpy())
     
     return np.array(completed_images)
 
 def plot_completed_images(original_image, masked_image, completed_images):
     num_images = completed_images.shape[0]
+    
     fig, axes = plt.subplots(1, num_images + 2, figsize=(15, 5))
     
     # Plot original image

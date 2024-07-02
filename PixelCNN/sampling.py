@@ -19,10 +19,8 @@ def sample(model, num_samples=100, device='cuda'):
                     out = model(samples)
                     # Convert logits to probabilities (already done in networks.py as a Softmax layer)
                     probs = F.softmax(torch.reshape(out, (num_samples, 256, 3, 32, 32))[:, :, k, i, j], dim=1)
-                    # print(probs[1][:])
                     # Sample from the distribution
                     pixel = torch.multinomial(probs, 1).squeeze(1)
-                    # print(pixel)
                     samples[:, k, i, j] = pixel / 255
 
     return samples.permute(0,2,3,1).cpu().detach().numpy() 
@@ -39,7 +37,7 @@ def save_samples(samples, filename='samples.png'):
         grid_size_1 = int(np.ceil(np.sqrt(num_samples)))
         grid_size_2 = grid_size_1
     
-    fig, axs = plt.subplots(grid_size_1, grid_size_2, figsize=(8, 8))
+    _, axs = plt.subplots(grid_size_1, grid_size_2, figsize=(8, 8))
     axs = axs.flatten()
 
     for img, ax in zip(samples, axs):
