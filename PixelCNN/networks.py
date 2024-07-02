@@ -47,16 +47,16 @@ class MaskedConv2d(nn.Conv2d):
         mask[:, :, :kHeight//2, :] = 1
         mask[:, :, kHeight//2, :kWidth//2 + 1] = 1
 
-        # # Create Boolean mask for each kernel to determine wether to mask out the color channel or not
-        # def color_mask(color_out, color_in):
-        #     a = (np.arange(out_channels) % data_channels == color_out)[:, None]
-        #     b = (np.arange(in_channels) % data_channels == color_in)[None, :]
-        #     return a * b
+        # Create Boolean mask for each kernel to determine wether to mask out the color channel or not
+        def color_mask(color_out, color_in):
+            a = (np.arange(out_channels) % data_channels == color_out)[:, None]
+            b = (np.arange(in_channels) % data_channels == color_in)[None, :]
+            return a * b
 
-        # # Mask out color channels according to the Paper: R -> R, G -> RG, B -> RGB
-        # for output_channel in range(data_channels):
-        #     for input_channel in range(output_channel + 1, data_channels):
-        #         mask[color_mask(output_channel, input_channel), kHeight//2, kWidth//2] = 0
+        # Mask out color channels according to the Paper: R -> R, G -> RG, B -> RGB
+        for output_channel in range(data_channels):
+            for input_channel in range(output_channel + 1, data_channels):
+                mask[color_mask(output_channel, input_channel), kHeight//2, kWidth//2] = 0
         
         if mask_type == 'A':
             mask[:, :, kHeight//2, kWidth//2] = 0
@@ -79,6 +79,7 @@ class ResidualBlock(nn.Module):
         
         self.net = nn.Sequential(
             nn.ReLU(),
+            nn.BatchNorm2d(in_channels),
             MaskedConv2d(mask_type='B', in_channels=in_channels, out_channels=in_channels//2, kernel_size=1, padding=0),
             nn.BatchNorm2d(in_channels//2),
             nn.ReLU(),
