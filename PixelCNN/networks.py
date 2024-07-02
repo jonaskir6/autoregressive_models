@@ -78,8 +78,8 @@ class ResidualBlock(nn.Module):
         super(ResidualBlock, self).__init__()
         
         self.net = nn.Sequential(
-            nn.ReLU(),
             nn.BatchNorm2d(in_channels),
+            nn.ReLU(),
             MaskedConv2d(mask_type='B', in_channels=in_channels, out_channels=in_channels//2, kernel_size=1, padding=0),
             nn.BatchNorm2d(in_channels//2),
             nn.ReLU(),
