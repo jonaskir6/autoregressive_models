@@ -20,7 +20,6 @@ def evaluate(test_data_loader, model, device, batch_size):
             images = images.view(-1)
             output = torch.reshape(output, (batch_size, 256, 3, 32, 32))
             output = output.permute(0,2,3,4,1).contiguous().view(-1, 256)
-            # loss_func = nn.functional.cross_entropy(output,images)
             loss.append(nn.functional.cross_entropy(output, (images*255).long()))
 
     loss=torch.Tensor(loss)   
