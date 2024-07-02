@@ -14,7 +14,11 @@ class Dataset():
                 transforms.ToTensor(),
             ])
         elif dataset=='mnist':
-            self.transform = transforms.ToTensor()
+            self.transform = transforms.Compose([
+                transforms.Grayscale(num_output_channels=3),
+                transforms.Resize((32, 32)),
+                transforms.ToTensor(),
+            ])
         # Train and test data
         if dataset == 'mnist':
             self.train_data = datasets.MNIST(data_dir, train=True, download=True, transform=self.transform)
@@ -25,8 +29,8 @@ class Dataset():
         else:
             raise ValueError('Dataset not implemented')
         # Data loaders
-        self.train_data_loader = torch.utils.data.DataLoader(self.train_data, batch_size, shuffle=True)
-        self.test_data_loader = torch.utils.data.DataLoader(self.test_data, batch_size, shuffle=False)
+        self.train_data_loader = torch.utils.data.DataLoader(self.train_data, batch_size, shuffle=True, drop_last=True)
+        self.test_data_loader = torch.utils.data.DataLoader(self.test_data, batch_size, shuffle=False, drop_last=True)
     
     def get_train_data_loader(self):
         return self.train_data_loader

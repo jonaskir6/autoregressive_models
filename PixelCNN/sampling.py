@@ -39,11 +39,11 @@ def save_samples(samples, filename='samples.png'):
         grid_size_1 = int(np.ceil(np.sqrt(num_samples)))
         grid_size_2 = grid_size_1
     
-    fig, axs = plt.subplots(grid_size_1, grid_size_2, figsize=(32, 32))
+    fig, axs = plt.subplots(grid_size_1, grid_size_2, figsize=(8, 8))
     axs = axs.flatten()
 
     for img, ax in zip(samples, axs):
-        ax.imshow((img / 3 * 255).astype(int))
+        ax.imshow((img * 255).astype(int))
         ax.axis('off')
 
     # Turn off remaining empty subplots

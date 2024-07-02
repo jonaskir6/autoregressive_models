@@ -10,18 +10,21 @@ class PixelCNN(nn.Module):
     """
     PixelCNN Network
     """
-    def __init__(self, num_kernels=128,  num_residual=10):
+    def __init__(self, num_kernels=128,  num_residual=7, in_channels=3):
         super(PixelCNN, self).__init__()
 
         self.net = nn.Sequential(
-            MaskedConv2d(mask_type='A', kernel_size=7, in_channels=3 ,out_channels=2*num_kernels, padding=3),
+            MaskedConv2d(mask_type='A', kernel_size=7, in_channels=in_channels ,out_channels=2*num_kernels, padding=3),
             *[ResidualBlock(2*num_kernels) for _ in range(num_residual)],
+            nn.BatchNorm2d(2*num_kernels),
             nn.ReLU(),
             MaskedConv2d(in_channels=2*num_kernels, out_channels=2*num_kernels, mask_type='B', kernel_size=1, padding=0),
+            nn.BatchNorm2d(2*num_kernels),
             nn.ReLU(),
             MaskedConv2d(in_channels=2*num_kernels, out_channels=2*num_kernels, mask_type='B', kernel_size=1, padding=0),
+            nn.BatchNorm2d(2*num_kernels),
             nn.ReLU(),
-            nn.Conv2d(in_channels=2*num_kernels, out_channels=3*256, kernel_size=1, stride=1, padding=0 )
+            nn.Conv2d(in_channels=2*num_kernels, out_channels=in_channels*256, kernel_size=1, stride=1, padding=0 )
         )
 
     def forward(self, x):
@@ -77,8 +80,10 @@ class ResidualBlock(nn.Module):
         self.net = nn.Sequential(
             nn.ReLU(),
             MaskedConv2d(mask_type='B', in_channels=in_channels, out_channels=in_channels//2, kernel_size=1, padding=0),
+            nn.BatchNorm2d(in_channels//2),
             nn.ReLU(),
             MaskedConv2d(mask_type='B', in_channels=in_channels//2, out_channels=in_channels//2, kernel_size=3, padding=1),
+            nn.BatchNorm2d(in_channels//2),
             nn.ReLU(),
             MaskedConv2d(mask_type='B', in_channels=in_channels//2, out_channels=in_channels, kernel_size=1, padding=0)
         )
