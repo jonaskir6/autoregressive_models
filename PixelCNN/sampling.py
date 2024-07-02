@@ -25,7 +25,7 @@ def sample(model, num_samples=100, device='cuda'):
 
     return samples.permute(0,2,3,1).cpu().detach().numpy() 
 
-def save_samples(samples, filename='samples.png'):
+def save_samples(samples, filename='samples.png', mnist = False):
     # Get the number of samples
     num_samples = samples.shape[0]
 
@@ -41,8 +41,12 @@ def save_samples(samples, filename='samples.png'):
     axs = axs.flatten()
 
     for img, ax in zip(samples, axs):
-        ax.imshow((img * 255).astype(int))
+        if(mnist):
+            ax.imshow(img, cmap='Greys_r')
+        else:    
+            ax.imshow((img * 255).astype(int))
         ax.axis('off')
+
 
     # Turn off remaining empty subplots
     for i in range(num_samples, len(axs)):
