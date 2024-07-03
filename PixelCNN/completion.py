@@ -43,6 +43,40 @@ def mask_image(image, mask_fraction=0.5):
     
     return masked_image, mask
 
+def mask_image_right_half(image, mask_fraction=0.5):
+    C, H, W = image.shape
+    
+    # Calculate the height of the masked area
+    mask_width = int(H * mask_fraction)
+    
+    # Create a mask with ones in the top half and zeros in the bottom half
+    mask = torch.ones((C, H, W))
+    mask[:, :, -mask_width:] = 0
+    
+    # Apply the mask to the image
+    masked_image = image * mask
+    
+    return masked_image, mask
+
+def mask_image_chessboard(image, field_size=1):
+    C, H, W = image.shape
+
+    # Create a mask with a chessboard pattern
+    mask = torch.ones((H, W))
+    for i in range(0, H, field_size * 2):
+        for j in range(0, W, field_size * 2):
+            mask[i:i + field_size, j:j + field_size] = 0
+            if i + field_size < H and j + field_size < W:
+                mask[i + field_size:i + field_size * 2, j + field_size:j + field_size * 2] = 0
+
+    # Repeat the mask across all channels
+    mask = mask.unsqueeze(0).repeat(C, 1, 1)
+
+    # Apply the mask to the image
+    masked_image = image * mask
+    
+    return masked_image, mask
+
 def complete(model, masked_image, mask, num_completions=5, device='cuda'):
     model.to(device)
     masked_image = masked_image.to(device)
