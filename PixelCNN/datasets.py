@@ -38,7 +38,7 @@ class Dataset():
     def get_test_data_loader(self):
         return self.test_data_loader
     
-    def visualize_dataset(self, data_loader):
+    def visualize_dataset(self, data_loader, num_samples):
         """
         Visualize the dataset
         Args:
@@ -57,7 +57,7 @@ class Dataset():
 
         if self.dataset=='cifar10':
             fig = plt.figure(figsize=(25, 8))
-            for idx in np.arange(40): 
+            for idx in np.arange(num_samples): 
                 ax = fig.add_subplot(4, 10, idx+1, xticks=[], yticks=[]) 
                 if images.shape[1] == 1:
                     ax.imshow(np.squeeze(images[idx]))
@@ -69,7 +69,7 @@ class Dataset():
             
         elif self.dataset=='mnist':
             fig = plt.figure(figsize=(25, 4))
-            for idx in np.arange(20):
+            for idx in np.arange(num_samples):
                 # subplot 2 rows and 10 columns, no grid, index starting from 1
                 ax = fig.add_subplot(2, 10, idx+1, xticks=[], yticks=[])
                 # Reshape the image (2D) & make it grayscale

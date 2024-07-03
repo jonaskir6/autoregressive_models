@@ -3,7 +3,6 @@ from torch import nn
 import torch
 import numpy as np
 
-# TODO: Residual Blocks: 2h out of context or the out_channels of Mask A 256?
 
 
 class PixelCNN(nn.Module):
@@ -47,20 +46,20 @@ class MaskedConv2d(nn.Conv2d):
         mask[:, :, :kHeight//2, :] = 1
         mask[:, :, kHeight//2, :kWidth//2 + 1] = 1
 
-        # Create Boolean mask for each kernel to determine wether to mask out the color channel or not
+         # Create Boolean mask for each kernel to determine wether to mask out the color channel or not
         def color_mask(color_out, color_in):
             a = (np.arange(out_channels) % data_channels == color_out)[:, None]
             b = (np.arange(in_channels) % data_channels == color_in)[None, :]
             return a * b
 
-        # Mask out color channels according to the Paper: R -> R, G -> RG, B -> RGB
+         # Mask out color channels according to the Paper: R -> R, G -> RG, B -> RGB
         for output_channel in range(data_channels):
             for input_channel in range(output_channel + 1, data_channels):
                 mask[color_mask(output_channel, input_channel), kHeight//2, kWidth//2] = 0
         
         if mask_type == 'A':
             mask[:, :, kHeight//2, kWidth//2] = 0
-
+        
         self.register_buffer('mask', torch.from_numpy(mask))
 
     def forward(self, x):
