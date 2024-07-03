@@ -14,4 +14,5 @@ PixelCNN:
 20:06: Jonas K. finished fixing networks.py (color channel dependencies, mask generation, nn Sequential for all classes, Residual Blocks and in_channels & out_channels) -> PixelCNN() call works 
 20.06: Jonas S. removed padding in final layers of network to get the right output shape + added implementation for evaluation.py 
 30.06: Jonas K. implemented alternative Version of PixelCNN (PixelCNNnew) 
+01.07: Jonas K. fixed PixelCNN network, added Batch Norm and 3 Channel MNIST
 02.07: Group session: Discussed final model and fixed some things (Jonas S and Niclas fixed and added completion for notebook; Ilias added mnist notebook; Jonas fixed general network structure)
