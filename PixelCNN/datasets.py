@@ -1,15 +1,14 @@
+import numpy as np
 import torch
 from torchvision import datasets, transforms    
-import ssl
 
-
-ssl._create_default_https_context = ssl._create_unverified_context
 
 class Dataset():
+   
 
-    def __init__(self, dataset, batch_size=64, data_dir='data'):
+    def __init__(self, dataset, batch_size=64, data_dir='data',label=None):
         self.dataset = dataset
-        if dataset=='cifar10':
+        if dataset=='cifar10' or dataset=='subset':
             self.transform = transforms.Compose([
                 transforms.ToTensor(),
             ])
@@ -26,6 +25,12 @@ class Dataset():
         elif dataset == 'cifar10':
             self.train_data = datasets.CIFAR10(data_dir, train=True, download=True, transform=self.transform)
             self.test_data = datasets.CIFAR10(data_dir, train=False, transform=self.transform)
+        elif dataset=='subset' and label is not None:
+            self.train_data = datasets.CIFAR10(data_dir, train=True, download=True, transform=self.transform)
+            self.test_data = datasets.CIFAR10(data_dir, train=False, transform=self.transform)
+            # Filter for images with specified label
+            self.train_data = [x for x in self.train_data if x[1] == label]
+            self.test_data = [x for x in self.test_data if x[1] == label]
         else:
             raise ValueError('Dataset not implemented')
         # Data loaders
@@ -55,7 +60,7 @@ class Dataset():
         images, labels = next(data_iter)
 
 
-        if self.dataset=='cifar10':
+        if self.dataset=='cifar10' or self.dataset=='subset':
             fig = plt.figure(figsize=(25, 8))
             for idx in np.arange(num_samples): 
                 ax = fig.add_subplot(4, 10, idx+1, xticks=[], yticks=[]) 
