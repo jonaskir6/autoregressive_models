@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import datasets, networks, sampling, evaluation
 from torchvision import transforms
 
-def get_random_cifar10_image(dataset_instance):
+def get_random_image(dataset_instance):
     """
     usage: 
     ds = datasets.Dataset('cifar10', batch_size=1)
